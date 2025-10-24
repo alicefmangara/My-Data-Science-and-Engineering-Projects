@@ -1,0 +1,823 @@
+'''
+=============================================
+========== Data Management Systems ==========
+============== LECD 2023/2024 ===============
+=============================================
+=================== PROJECT =================
+=============================================
+=============================================
+=== Department of Informatics Engineering ===
+=========== University of Coimbra ===========
+=============================================
+
+Author:Alice_Mangara 2020242411
+
+How to run?ex
+$ python3 -m venv django_env
+$ source django_env/bin/activate
+$ pip3 install flask
+$ pip3 install psycopg2-binary
+$ python3 demo-api.py
+--> Ctrl+C to stop
+$ deactivate
+'''
+
+import logging
+import time
+
+import flask
+from flask import jsonify
+import psycopg2
+
+app = flask.Flask(__name__)
+
+StatusCodes = {
+    'success': 200,
+    'api_error': 400,
+    'internal_error': 500
+}
+
+##########################################################
+## DATABASE ACCESS
+##########################################################
+
+def db_connection():
+    # connection details should not be here, especially the password
+    db = psycopg2.connect(
+        user='postgres',
+        password='postgresql',
+        host='localhost',
+        port='5432',
+        database='SGD2023'
+    )
+
+    return db
+
+
+'''
+
+--------------------- Endpoints
+
+'''
+@app.route('/')
+def landing_page():
+    return '''
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>PET SHOP</title>
+        </head>
+        <body>
+            <h1>PET SHOP</h1>
+            <p>SGD 2023</p>
+            <p>Afonso Rodrigues 2020242400</p>
+            <p>Alice Mangara 2020242411</p>
+            <p>Nuria Silva 2020242444</p>
+        </body>
+        </html>
+    '''
+
+
+#_____1____#
+# Create Item (POST)
+
+@app.route('/proj/api/item', methods=['POST'])
+def create_item():
+    logger.info('POST /proj/api/item')
+    payload = flask.request.get_json()
+
+    conn = db_connection()
+    cur = conn.cursor()
+
+    logger.debug(f'POST /proj/api/item - payload: {payload}')
+
+    # Validate payload fields before insertion
+    required_fields = ["id",
+                        "name",
+                        "price",
+                        "stock",
+                        "description",
+                        "manufacturer",
+                        "weight",
+                        "image_url",
+                        "category_id"]
+    
+    for field in required_fields:
+        if field not in payload:
+            response = {'status': StatusCodes['api_error'], 'results': f'{field} value not in payload'}
+            return flask.jsonify(response)
+
+    # Parameterized query for inserting into 'item' table
+    statement = '''INSERT INTO item (id,
+                name,
+                price,
+                stock,
+                description,
+                manufacturer,
+                weight,
+                image_url,
+                category_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'''
+    cur.execute("SELECT MAX (id) FROM item")
+    new_item_id = cur.fetchone()[0]+1
+
+    values = (new_item_id,
+            payload["name"],
+            payload["price"],
+            payload["stock"],
+            payload["description"],
+            payload["manufacturer"],
+            payload["weight"],
+            payload["image_url"],
+            payload["category_id"])
+
+    try:
+        cur.execute(statement, values)
+        conn.commit()
+        response = {'status': StatusCodes['success'], 'results': f'Inserted item {payload["name"]}'}
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        logger.error(f'POST /proj/api/item - error: {error}')
+        response = {'status': StatusCodes['internal_error'], 'results': str(error)}
+        
+        # an error occurred, rollback
+        conn.rollback()
+
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return flask.jsonify(response)
+
+
+#_____2____#
+# Update Item (PUT)
+
+@app.route('/proj/api/item/<item_id>', methods=['PUT'])
+def update_item(item_id):
+    logger.info(f'PUT /proj/api/item/{item_id}')
+    payload = flask.request.get_json()
+
+    conn = db_connection()
+    cur = conn.cursor()
+
+    logger.debug(f'PUT /proj/api/item/{item_id} - payload: {payload}')
+
+    # Check if 'item_id' exists before updating
+    check_statement = 'SELECT * FROM item WHERE id = %s'
+    cur.execute(check_statement, (item_id,))
+        
+    if cur.fetchone() is None:
+        response = {'status': StatusCodes['not_found'], 'results': f'Item with ID {item_id} not found'}
+        return flask.jsonify(response)
+
+    set_values = ', '.join([f"{key} = '{value}'" for key, value in payload.items()])
+    update_statement = f'UPDATE item SET {set_values} WHERE id = {item_id}'
+
+    try:
+        cur.execute(update_statement)
+        conn.commit()
+        response = {'status': StatusCodes['success'], 
+                    'message': 'Item updated successfully',
+                    'results': f'Updated item with ID {item_id}'
+        }
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        logger.error(f'PUT /proj/api/item/{item_id} - error: {error}')
+        response = {'status': StatusCodes['internal_error'], 
+                    'results': str(error)}
+        conn.rollback()
+
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return flask.jsonify(response)
+
+
+#_____3____#
+# Delete Item from Shopping Cart(DELETE)
+
+@app.route('/proj/api/cart/<item_id>', methods=['DELETE'])
+def delete_item_from_cart(item_id):
+    logger.info(f'DELETE /proj/api/cart/{item_id}')
+
+    conn = db_connection()
+    cur = conn.cursor()
+
+    try:
+        delete_statement = 'DELETE FROM cart_item WHERE item_id = %s'
+        cur.execute(delete_statement, (item_id,))
+        conn.commit()
+        response = {'status': StatusCodes['success'], 'results': f'Deleted item {item_id} from cart'}
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        logger.error(f'DELETE /proj/api/cart/{item_id} - error: {error}')
+        response = {'status': StatusCodes['internal_error'], 'results': str(error)}
+        conn.rollback()
+
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return flask.jsonify(response)
+ 
+ 
+#_____4____#
+# Add Item to Shopping Cart (POST)
+
+@app.route('/proj/api/cart', methods=['POST'])
+def add_item_to_cart():
+    logger.info('POST /proj/api/cart')
+    payload = flask.request.get_json()
+
+    conn = db_connection()
+    cur = conn.cursor()
+
+    logger.debug(f'POST /proj/api/cart - payload: {payload}')
+
+    # Validate payload fields before insertion
+    required_fields = ['item_id', 'quantity', 'cart_client_id']
+    
+    for field in required_fields:
+        if field not in payload:
+            response = {'status': StatusCodes['api_error'], 
+                        'results': f'{field} value not in payload'}
+            return flask.jsonify(response)
+
+    # Parameterized query for inserting into 'cart_item' table
+    statement = 'INSERT INTO cart_item (item_id, quantity, cart_client_id) VALUES (%s, %s, %s)'
+                    
+    values = (payload['item_id'], payload['quantity'], payload['cart_client_id'])
+
+    try:
+        cur.execute(statement, values)
+        conn.commit()
+        response = {'status': StatusCodes['success'], 
+                    'results': f'Added item {payload["item_id"]} to cart'}
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        logger.error(f'POST /proj/api/cart - error: {error}')
+        response = {'status': StatusCodes['internal_error'], 'results': str(error)}
+        # an error occurred, rollback
+        conn.rollback()
+
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return flask.jsonify(response)
+
+
+#_____5____#
+# Get Items List(GET)
+
+##
+## To use it, access: 
+## 
+## http://localhost:8080/proj/api/item
+##
+## To sort by id, access: http://localhost:8080/proj/api/item?sort=id
+##
+## To change page limit, acess: http://localhost:8080/proj/api/item?limit=20 (for example)
+##
+
+@app.route('/proj/api/item', methods=['GET'])
+def get_item_list():
+    logger.info('GET /proj/api/item/')
+    page = flask.request.args.get('page', default=1, type=int)
+    limit = flask.request.args.get('limit', default=10, type=int)
+    category = flask.request.args.get('category', default=None, type=str)
+    sort = flask.request.args.get('sort', default=None, type=str)
+
+    conn = db_connection()
+    cur = conn.cursor()
+
+    # Construct the SELECT query with optional filters and sorting
+    query = 'SELECT * FROM item'
+    conditions = []
+
+    if category:
+        conditions.append(f'category_id = {category}')
+
+    if conditions:
+        query += ' WHERE ' + ' AND '.join(conditions)
+
+    if sort:
+        query += f' ORDER BY {sort}'
+
+    query += f' LIMIT {limit} OFFSET {(page - 1) * limit}'
+
+    try:
+        cur.execute(query)
+        rows = cur.fetchall()
+
+        logger.debug('GET /proj/api/item - parse')
+        results = []
+        for row in rows:
+            content = {
+                'id': row[0],
+                'name': row[1],
+                # Include other relevant fields here
+            }
+            results.append(content)
+
+        response = {'status': StatusCodes['success'], 'results': results}
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        logger.error(f'GET /proj/api/item - error: {error}')
+        response = {'status': StatusCodes['internal_error'], 'results': str(error)}
+
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return flask.jsonify(response)
+
+
+#_____6____#
+#Get Item Details (GET)
+
+@app.route('/proj/api/item/<item_id>', methods=['GET'])
+def get_item_details(item_id):
+    logger.info(f'GET /proj/api/item/{item_id}')
+
+    conn = db_connection()
+    cur = conn.cursor()
+
+    try:
+        cur.execute('SELECT * FROM item WHERE id = %s', (item_id,))
+        row = cur.fetchone()
+
+        if row:
+            item_details = {
+                'id': row[0],
+                'name': row[1],
+                # Include other relevant fields here
+            }
+            response = {'status': StatusCodes['success'], 'results': item_details}
+        else:
+            response = {'status': StatusCodes['not_found'], 'results': f'Item with ID {item_id} not found'}
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        logger.error(f'GET /proj/api/item/{item_id} - error: {error}')
+        response = {'status': StatusCodes['internal_error'], 'results': str(error)}
+
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return flask.jsonify(response)
+
+
+#_____7____#
+# Search Items (GET)
+
+@app.route('/proj/api/item/search', methods=['GET'])
+def search_item():
+    logger.info('GET /proj/api/item/search')
+    query_string = flask.request.args.get('query', default='', type=str)
+
+    conn = db_connection()
+    cur = conn.cursor()
+
+    try:
+        search_query = f"SELECT * FROM item WHERE name ILIKE '%{query_string}%' OR description ILIKE '%{query_string}%'"
+        cur.execute(search_query)
+        rows = cur.fetchall()
+
+        results = []
+        for row in rows:
+            content = {
+                'id': row[0],
+                'name': row[1],
+                'price':row[2],
+                'stock':row[3],
+                'description':row[4],
+                'manufacturer':row[5],
+                'weight':row[6],
+                'image_url':row[7],
+                'category_id':row[8]
+                # Include other relevant fields here
+            }
+            results.append(content)
+
+        response = {'status': StatusCodes['success'], 'results': results}
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        logger.error(f'GET /proj/api/item/search - error: {error}')
+        response = {'status': StatusCodes['internal_error'], 'results': str(error)}
+
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return flask.jsonify(response)
+
+
+#_____8____#
+# Get Top 3 Sales per Category (GET)
+
+##
+##  Get Top 3 Sales per Category(GET)
+##
+## To use it, access: 
+## 
+## http://localhost:8080/proj/api/stats/sales
+##
+
+@app.route('/proj/api/stats/sales', methods=['GET'])
+def get_top_sales_per_category():
+    logger.info('GET /proj/api/stats/sales')
+
+    conn = db_connection()
+    cur = conn.cursor()
+
+    try:
+        cur.execute('SELECT * FROM category')
+        categories_rows = cur.fetchall()
+
+        top_sales_per_category = {}
+
+        for category_row in categories_rows:
+            category_id = category_row[0]
+            category_name = category_row[1]
+
+            cur.execute('''SELECT p.name as item_name, 
+                        SUM(pc.quantity) as total_sales
+                        FROM item_purchase pc
+                            JOIN item p ON pc.item_id = p.id
+                            JOIN category c ON p.category_id = c.id
+                            JOIN purchase co ON pc.purchase_id = co.id
+                        WHERE c.id = %s
+                            GROUP BY p.name
+                            ORDER BY total_sales DESC
+                            LIMIT 3
+                            ''', (category_id,))
+                    
+            top_sales_rows = cur.fetchall()
+
+            top_sales_items = []
+            for top_sale_row in top_sales_rows:
+                item = {
+                'item_name': top_sale_row[0],
+                'total_sales': float(top_sale_row[1])  
+            }
+                top_sales_items.append(item)
+
+            top_sales_per_category[category_name] = top_sales_items
+
+        response = {f'status': StatusCodes['success'], 'message': 'Top 3 sales per category retrieved successfully', 
+                    'data': {'top_sales_per_category': top_sales_per_category}}
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        logger.error(f'GET /proj/api/stats/sales - error: {error}')
+        response = {f'status': StatusCodes['internal_error'], 'message': 'Internal Server Error', 'error': str(error)}
+
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return jsonify(response)
+
+
+#_____9____#
+# Purchase Items (POST)
+## POST
+##
+## To use it, you need to use postman or curl: 
+##
+## curl -X POST http://localhost:8080/proj/api/purchase/ -H 'Content-Type: application/json' -d 
+## '{"cart":[{"item_id":19,"quantity":3}, {"item_id":14,"quantity":2}],"client_id":123}'
+##
+
+@app.route('/proj/api/purchase', methods=['POST'], strict_slashes=True)
+def purchase_item():
+    logger.info('POST /proj/api/purchase')
+    payload = flask.request.get_json()
+    
+    conn = db_connection()
+    cur = conn.cursor()
+    
+    logger.debug(f'POST /proj/api/purchase/ - payload {payload}')
+    
+    # Validating arguments
+    
+    args = ["cart","client_id"]
+
+    for arg in args:
+        if arg not in payload:
+            response = {'status': StatusCodes['api_error'], 'results': f'{arg} not in payload'}
+            return flask.jsonify(response)
+
+    if "cart" in payload:
+        cart = payload["cart"]
+
+        if len(cart)==0:
+            response = {'status': StatusCodes['api_error'], 'results': 'cart should be a non-empty list'}
+            return flask.jsonify(response)
+
+        for item in cart:
+            if "item_id" not in item or "quantity" not in item:
+                response = {'status': StatusCodes['api_error'], 'results': 'item_id and quantity are required'}
+                return flask.jsonify(response)
+
+            if item['item_id'] <= 0:
+                response = {'status': StatusCodes['api_error'], 'results': 'item_id must be a positive integer'}
+                return flask.jsonify(response)
+            
+            if item['quantity'] <= 0:
+                response = {'status': StatusCodes['api_error'], 'results': 'quantity must be a positive integer'}
+                return flask.jsonify(response)
+
+
+    cart = payload['cart']   
+    total = 0
+
+    try:
+        for item in cart:
+            item_cart = item['item_id']
+            quantity_cart = item['quantity']
+            
+            # Select the item that already in cart_item
+            cart_item = """SELECT quantity, item_id, cart_client_id 
+            FROM cart_item WHERE cart_client_id= '%s'"""
+            values_c = (payload['client_id'],)
+            cur.execute(cart_item, values_c)
+            data = cur.fetchall()
+            
+            for info in data:
+                quantity = info[0]
+                item_id = info[1]
+                cart_client_id = info[2]
+
+                if item_cart != item_id:
+                    item_id = item_cart
+                
+                if quantity_cart != quantity:
+                    quantity = quantity_cart
+
+                # Select price and stock to verify the stock and calculate the total price
+                try: 
+                    cur.execute('SELECT price, stock FROM item WHERE id = %s', (item_id,))
+                    stock = cur.fetchone()
+
+                except (Exception, psycopg2.DatabaseError) as error:
+                        logger.error(f'POST /proj/api/purchase - Error select item: {error}')
+                        response = {'status': StatusCodes['internal_error'], 'results_2': str(error)}
+                        conn.rollback()
+                        return flask.jsonify(response)
+                
+                if stock and stock[1] >= quantity:
+                    total += stock[0] * quantity
+
+                    # Update stock
+                    cur.execute('UPDATE item SET stock = stock - %s WHERE id = %s', (quantity, item_id))
+
+                    # Remove all from cart_item where client_id = X
+                    remove =  "DELETE FROM cart_item WHERE cart_client_id = %s"
+                    values_r = (cart_client_id,)
+                    cur.execute(remove, values_r)
+                    
+                else:
+                    conn.rollback()
+                    response = {'status': StatusCodes['api_error'], 'results': 'Insufficient stock for some items'}
+                    return flask.jsonify(response)
+                
+    except (Exception, psycopg2.DatabaseError) as error:
+        logger.error(f'POST /proj/api/purchase - Error: {error}')
+        response = {'status': StatusCodes['internal_error'], 'results_1': str(error)}
+        conn.rollback()
+        return flask.jsonify(response)
+    
+    try:
+        # Insert new purchase
+        cur.execute("SELECT MAX (id) FROM purchase")
+        new_purchase_id = cur.fetchone()[0]+1
+        purchase = """INSERT INTO purchase (id, date_, status, payment_method, client_id) 
+            VALUES (%s, CURRENT_TIMESTAMP, 'True', '1', %s)"""
+        values_p = (new_purchase_id, payload['client_id'],)
+        cur.execute(purchase, values_p)  ### COMPLETAR COM O STATUS e metodo de pagamento
+        conn.commit()
+        
+        for item in cart:
+            item_cart = item['item_id']
+            quantity_cart = item['quantity']
+            
+            # Import data to item_purchase table
+            item_purchase_query = "INSERT INTO item_purchase (quantity, item_id, purchase_id) VALUES (%s, %s, %s)"
+            item_purchase_values = (quantity_cart, item_cart, new_purchase_id)
+            cur.execute(item_purchase_query, item_purchase_values)
+
+
+        response = {
+            'status': StatusCodes['success'],
+            'message': 'Purchase completed successfully',
+            'order_id': new_purchase_id,
+            'total_price': total
+        }
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        logger.error(f'POST /proj/api/purchase - Error registering sale: {error}')
+        response = {'status': StatusCodes['internal_error'], 'results_3': str(error)}
+        conn.rollback()
+        return flask.jsonify(response)
+
+    finally:
+        if conn is not None:
+            conn.commit()
+            conn.close()
+        
+
+    return flask.jsonify(response)
+
+
+#_____10____#
+## Demo GET
+## Ponto 10
+## Obter todos os clients com filtros em formato JSON 
+##
+## To use it, access: 
+## 
+## http://localhost:8080/proj/api/client/
+##
+
+@app.route('/proj/api/client/', methods=['GET'], strict_slashes=True)
+def get_all_clients():
+    logger.info('GET /proj/api/client')
+
+    conn = db_connection()
+    cur = conn.cursor()
+
+    try:
+        cur.execute('''SELECT client.id, client.name, client.mail, 
+                    max(purchase.date_), max(item.name) 
+                    FROM client 
+                    INNER JOIN purchase ON client.id=purchase.client_id 
+                    INNER JOIN item_purchase ON item_purchase.purchase_id = purchase.id 
+                    INNER JOIN item ON item_purchase.item_id = item.id 
+                    GROUP BY client.id ORDER BY client.id''')
+        rows = cur.fetchall()
+        logger.debug('GET /proj/api/client - parse')
+        Results = []
+        for row in rows:
+            logger.debug(row)
+            content = {'id': row[0], 
+                       'name': row[1], 
+                       'mail': row[2],
+                       'last_purchase_date':row[3],
+                       'last_item_bought':row[4]}
+            Results.append(content)  # appending to the payload to be returned
+
+        response = {'status': StatusCodes['success'], 'results': Results}
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        logger.error(f'GET /proj/api/client - error: {error}')
+        response = {'status': StatusCodes['internal_error'], 'results': str(error)}
+
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return flask.jsonify(response)
+
+#_____11____#
+##
+## Demo POST
+##
+## Add a new client in a JSON payload
+##
+## To use it, you need to use postman or curl: 
+##
+## curl -X POST http://localhost:8080/proj/api/client/ -H 'Content-Type: application/json' -d '{"client_id": "client456", "name": "New Client", "email": "newclient@email.com"}'
+##
+# Rota para adicionar clientes
+
+@app.route('/proj/api/client/', methods=['POST'])
+def add_client():
+    logger.info('POST /proj/api/client')
+    payload = flask.request.get_json()
+
+    conn = db_connection()
+    cur = conn.cursor()
+
+    logger.debug(f'POST /client - payload: {payload}')
+
+
+    required_fields = ['name', 'mail']
+    for field in required_fields:
+        if field not in payload:
+            response = {'status': StatusCodes['api_error'], 'message': f'{field} not in payload'}
+            return flask.jsonify(response), StatusCodes['api_error']
+
+    cur.execute("SELECT MAX (id) FROM client")
+    new_client_id = cur.fetchone()[0]+1
+
+    statement = 'INSERT INTO client (id,name, mail) VALUES (%s,%s, %s)'
+    values = (new_client_id,payload['name'], payload['mail'])
+
+    try:
+        cur.execute(statement, values)
+        conn.commit()
+
+     
+        response = {
+            'status': StatusCodes['success'],
+            'message': 'Client added successfully',
+            'client': {
+                'id': new_client_id,
+                'name': payload['name'],
+                'email': payload['mail']
+            }
+        }
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        logger.error(f'POST /proj/api/client - error: {error}')
+        response = {f'status': StatusCodes['internal_error'], 'message': 'Internal Server Error'}
+
+        conn.rollback()
+
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return flask.jsonify(response)
+
+#_____12____#
+##
+## Demo GET
+##
+## Get Client Orders (GET)
+##
+## To use it, access: 
+## 
+## http://localhost:8080/proj/api/client/<id>/orders
+##
+
+@app.route('/proj/api/client/<int:id>/orders', methods=['GET'])
+def get_client_orders(id):
+    logger.info(f'GET /proj/api/client/{id}/orders')
+
+    conn = db_connection()
+    cur = conn.cursor()
+
+    try:
+        cur.execute('SELECT * FROM client WHERE id = %s', (id,))
+        client_row = cur.fetchone()
+
+        if not client_row:
+            response = {'status': 404, 'message': 'Client not found'}
+        else:          
+            cur.execute('SELECT * FROM purchase WHERE client_id = %s', (id,))
+            orders_rows = cur.fetchall()
+
+            client_orders = []
+            for order_row in orders_rows:
+                order = {
+                    'order_id': order_row[0],
+                    'items': [],
+                    'total_price': 0.0,  
+                    'order_date': order_row[1].isoformat()  
+                }
+
+                cur.execute('''SELECT pc.item_id, pc.quantity, p.price
+                    FROM item_purchase pc
+                    JOIN item p ON pc.item_id = p.id
+                    WHERE pc.purchase_id = %s''', (order['order_id'],))
+                product_rows = cur.fetchall()
+
+                for pr in product_rows:
+                    item = {'item_id': pr[0], 'quantity': pr[1]}
+                    order['items'].append(item)
+                    order['total_price'] += pr[1] * pr[2]
+
+                client_orders.append(order)
+
+            response = {f'status': StatusCodes['success'], 'message': 'Client orders retrieved successfully', 'data': client_orders}
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        logger.error(f'GET /proj/api/client/{id}/orders - error: {error}')
+        response = {f'status': StatusCodes['internal_error'], 'message': 'Internal Server Error', 'error': str(error)}
+
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return jsonify(response)
+
+if __name__ == '__main__':
+    # set up logging
+    logging.basicConfig(filename='log_file.log')
+    logger = logging.getLogger('logger')
+    logger.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+
+    # create formatter
+    formatter = logging.Formatter('%(asctime)s [%(levelname)s]:  %(message)s', '%H:%M:%S')
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+
+    host = '127.0.0.1'
+    port = 8080
+    app.run(host=host, debug=True, threaded=True, port=port)
+    logger.info(f'API v1.0 online: http://{host}:{port}')

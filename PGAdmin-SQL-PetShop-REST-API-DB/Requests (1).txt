@@ -1,0 +1,337 @@
+{
+	"info": {
+		"_postman_id": "0669cfc2-7f01-4b37-b0c3-8858db2a4cf9",
+		"name": "Carts",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "18492612"
+	},
+	"item": [
+		{
+			"name": "POST/ cart",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"item_id\":12,\r\n    \"quantity\":2,\r\n    \"cart_client_id\":123\r\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/proj/api/cart",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"proj",
+						"api",
+						"cart"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE /cart",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/proj/api/cart/12",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"proj",
+						"api",
+						"cart",
+						"12"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /client",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "127.0.0.1:8080/client",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"client"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST /client",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"client_id\": \"client456\", \"name\": \"New Client\", \"mail\": \"newclient@email.com\"}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/client/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"client",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /item",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "127.0.0.1:8080/departments",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"departments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SEARCH item",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Sagres\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/proj/api/item/search?name=Item%20A",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"proj",
+						"api",
+						"item",
+						"search"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "Item%20A"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST /produto",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ndep\": 50,\r\n    \"localidade\": \"Nova Localidade\",\r\n    \"nome\": \"Novo Dep\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:8080/departments/",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"departments",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET item (only one)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/proj/api/item/13",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"proj",
+						"api",
+						"item",
+						"13"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT /item",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Sagres\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/proj/api/item/21",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"proj",
+						"api",
+						"item",
+						"21"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST /purchase",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"cart\":[\r\n        {\r\n            \"item_id\":19,\r\n            \"quantity\":3\r\n        },\r\n        {\r\n            \"item_id\":14,\r\n            \"quantity\":2\r\n        }\r\n    ],\r\n    \"client_id\":123\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/proj/api/purchase",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"proj",
+						"api",
+						"purchase"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "New Request",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"cart\":[\r\n        {\r\n            \"item_id\":19,\r\n            \"quantity\":3\r\n        },\r\n        {\r\n            \"item_id\":14,\r\n            \"quantity\":2\r\n        }\r\n    ],\r\n    \"client_id\":123\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/proj/api/purchase",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"proj",
+								"api",
+								"purchase"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "Werkzeug/3.0.1 Python/3.9.13"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 29 Dec 2023 00:01:02 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "123"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": \"Purchase completed successfully\",\n    \"order_id\": 28,\n    \"status\": 200,\n    \"total_price\": 146.20000000000002\n}"
+				}
+			]
+		}
+	]
+}
