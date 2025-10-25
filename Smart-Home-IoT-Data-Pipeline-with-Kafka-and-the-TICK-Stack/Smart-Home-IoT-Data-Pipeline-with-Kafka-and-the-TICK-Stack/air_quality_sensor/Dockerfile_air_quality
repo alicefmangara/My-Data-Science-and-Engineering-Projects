@@ -1,0 +1,8 @@
+FROM python:3.11
+
+RUN pip install --no-cache-dir kafka-python==2.0.2
+
+WORKDIR /app
+COPY air_quality_sensor.py /app
+
+CMD ["python", "air_quality_sensor.py"]

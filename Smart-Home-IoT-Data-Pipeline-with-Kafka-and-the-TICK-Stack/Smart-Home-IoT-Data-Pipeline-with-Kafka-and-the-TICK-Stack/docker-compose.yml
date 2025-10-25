@@ -1,0 +1,165 @@
+version: "3.9"
+
+services:
+  zookeeper:
+    container_name: zookeeper
+    image: bitnami/zookeeper:latest
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+      - ZOOKEEPER_CLIENT_PORT=2181
+    healthcheck:
+      test: nc -z localhost 2181 || exit -1
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    volumes:
+      - zookeeper-data:/bitnami
+    networks:
+      - kafka-net
+
+  kafka:
+    container_name: kafka
+    image: bitnami/kafka:latest
+    restart: always
+    networks:
+      - kafka-net
+    environment:
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: "CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT"
+      KAFKA_CFG_LISTENERS: "CLIENT://:9092,EXTERNAL://:9093"
+      KAFKA_CFG_ADVERTISED_LISTENERS: "CLIENT://kafka:9092,EXTERNAL://:9093"
+      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: "CLIENT"
+    volumes:
+      - kafka-data:/bitnami
+    healthcheck:
+      test: ["CMD", "kafka-topics.sh", "-list", "-bootstrap-server", "localhost:9092"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+
+  telegraf:
+    image: telegraf:latest
+    container_name: telegraf
+    restart: always
+    volumes:
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    networks:
+      - kafka-net
+      - tick-net
+    depends_on:
+      kafka:
+        condition: service_healthy
+      influxdb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "bash", "-c", "telegraf -test -config /etc/telegraf/telegraf.conf | grep kafka_consumer"]
+      interval: 10s
+      timeout: 15s
+      retries: 6
+
+  influxdb:
+    image: influxdb:latest
+    container_name: influxdb
+    networks:
+      - tick-net
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_DB=tp2
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=password
+      - DOCKER_INFLUXDB_INIT_ORG=sic
+      - DOCKER_INFLUXDB_INIT_BUCKET=tp2
+      - DOCKER_INFLUXDB_INIT_RETENTION=1w
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=LRk4Qb4QtnFqdn83kYDG-1EXsNRkhFGrdZqJQhfy2IOTN7IIyVhWdwEu8PeKlvhXDHomucMZVOpE7tAPLSx0xQ==
+    ports:
+      - "8086:8086"
+    healthcheck:
+      test: "curl -f http://localhost:8086/ping"
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
+  temp1_sensor:
+    build:
+      context: ./temp1_sensor
+      dockerfile: Dockerfile_temp1
+    container_name: temp1_sensor
+    restart: on-failure
+    depends_on:
+      kafka:
+        condition: service_healthy
+      telegraf:
+        condition: service_healthy
+    environment:
+      - TEMP_MEAN=20
+      - TEMP_STDDEV=5
+    networks:
+      - kafka-net
+    
+  temp2_sensor:
+    build:
+      context: ./temp2_sensor
+      dockerfile: Dockerfile_temp2
+    container_name: temp2_sensor
+    restart: on-failure
+    depends_on:
+      kafka:
+        condition: service_healthy
+      telegraf:
+        condition: service_healthy
+    environment:
+      - TEMP_MEAN_2=25
+      - TEMP_STDDEV_2=7
+    networks:
+      - kafka-net
+    
+  humidity_sensor:
+    build:
+      context: ./humidity_sensor
+      dockerfile: Dockerfile_humidity
+    container_name: humidity_sensor
+    restart: on-failure
+    depends_on:
+      kafka:
+        condition: service_healthy
+      telegraf:
+        condition: service_healthy
+    environment:
+      - HUMIDITY_MEAN=50
+      - HUMIDITY_STDDEV=10
+    networks:
+      - kafka-net
+    
+  air_quality_sensor:
+    build:
+      context: ./air_quality_sensor
+      dockerfile: Dockerfile_air_quality
+    container_name: air_quality_sensor
+    restart: on-failure
+    depends_on:
+      kafka:
+        condition: service_healthy
+      telegraf:
+        condition: service_healthy
+    environment:
+      - AIR_QUALITY_MEAN=100
+      - AIR_QUALITY_STDDEV=25
+    networks:
+      - kafka-net
+    
+volumes:
+  zookeeper-data:
+    driver: local
+  kafka-data:
+    driver: local
+
+networks:
+  kafka-net:
+    driver: bridge
+  tick-net:
+    driver: bridge

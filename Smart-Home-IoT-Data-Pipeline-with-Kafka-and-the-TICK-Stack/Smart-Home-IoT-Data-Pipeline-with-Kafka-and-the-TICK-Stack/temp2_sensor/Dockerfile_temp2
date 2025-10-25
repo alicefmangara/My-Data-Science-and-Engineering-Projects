@@ -1,0 +1,8 @@
+FROM python:3.11
+
+RUN pip install --no-cache-dir kafka-python==2.0.2
+
+WORKDIR /app
+COPY temp2_sensor.py /app
+
+CMD ["python", "temp2_sensor.py"]
