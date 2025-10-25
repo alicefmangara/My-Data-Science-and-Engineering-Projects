@@ -1,0 +1,11 @@
+* abrir ambiente virtual no putty:
+python3 -m venv project
+source project/bin/activate
+pip install -r requirements.txt
+
+
+* certificar no winscp que estão os files dentro da pasta project
+* correr publisherA.py no putty
+* correr subscriberB.py no PC
+* verificar dados no influx
+...

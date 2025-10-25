@@ -1,0 +1,1658 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 15,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 80000
+              },
+              {
+                "color": "green",
+                "value": 90000
+              },
+              {
+                "color": "red",
+                "value": 100000
+              }
+            ]
+          },
+          "unit": "pressurepa"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "id": 6,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.0-cloud.2.aef9c3bd",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+          },
+          "query": "from(bucket: \"PROJECTB\")\r\n |> range(start: -1h)\r\n |> filter(fn: (r) => (r._measurement == \"18_pressure\") and (r._field ==\"value\"))\r\n |> yield(name: \"_results\")",
+          "refId": "A"
+        }
+      ],
+      "timeShift": "0h",
+      "title": "Last Pressure Value",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Pa",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "dashed"
+            }
+          },
+          "mappings": [
+            {
+              "options": {
+                "85000": {
+                  "index": 0,
+                  "text": "Base"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 80000
+              },
+              {
+                "color": "green",
+                "value": 90000
+              },
+              {
+                "color": "red",
+                "value": 100000
+              }
+            ]
+          },
+          "unit": "pressurepa"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "custom.axisColorMode",
+                "value": "series"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 6,
+        "y": 0
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "mean",
+            "variance"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+          },
+          "query": "from(bucket: \"PROJECTB\")\r\n |> range(start: -1h)\r\n |> filter(fn: (r) => (r._measurement == \"18_pressure\") and (r._field ==\"value\"))\r\n |> yield(name: \"_results\")",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+          },
+          "hide": false,
+          "query": "from(bucket: \"PROJECTB\")\r\n |> range(start: -1h)\r\n |> filter(fn: (r) => (r._measurement == \"18_pressure\") and (r._field ==\"value\"))\r\n |> movingAverage(n:30)\r\n |> yield(name: \"average\")",
+          "refId": "B"
+        }
+      ],
+      "timeShift": "0h",
+      "title": "Pressure History",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1,
+          "mappings": [
+            {
+              "options": {
+                "from": 20,
+                "result": {
+                  "index": 0
+                },
+                "to": 25
+              },
+              "type": "range"
+            }
+          ],
+          "max": 25,
+          "min": 20,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 20
+              },
+              {
+                "color": "green",
+                "value": 21.5
+              },
+              {
+                "color": "red",
+                "value": 23.5
+              }
+            ]
+          },
+          "unit": "celsius"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 6,
+        "x": 0,
+        "y": 8
+      },
+      "id": 3,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "text": {}
+      },
+      "pluginVersion": "10.0.0-cloud.2.aef9c3bd",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+          },
+          "query": "from(bucket: \"PROJECTB\")\r\n |> range(start: -1h)\r\n |> filter(fn: (r) => (r._measurement == \"18_temperature\") and (r._field ==\"value\"))\r\n |> yield(name: \"_results\")",
+          "refId": "A"
+        }
+      ],
+      "title": "Last Temperature value",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "ºC",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "dashed"
+            }
+          },
+          "mappings": [
+            {
+              "options": {
+                "20": {
+                  "index": 0,
+                  "text": "Base"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 20
+              },
+              {
+                "color": "red",
+                "value": 35
+              }
+            ]
+          },
+          "unit": "celsius"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "custom.axisColorMode",
+                "value": "series"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 6,
+        "y": 8
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "mean",
+            "variance"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+          },
+          "query": "from(bucket: \"PROJECTB\")\r\n |> range(start: -1h)\r\n |> filter(fn: (r) => (r._measurement == \"18_temperature\") and (r._field ==\"value\"))\r\n |> yield(name: \"_results\")",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+          },
+          "hide": false,
+          "query": "from(bucket: \"PROJECTB\")\r\n |> range(start: -1h)\r\n |> filter(fn: (r) => (r._measurement == \"18_temperature\") and (r._field ==\"value\"))\r\n |> movingAverage(n:30)\r\n |> yield(name: \"average\")",
+          "refId": "B"
+        }
+      ],
+      "timeShift": "0h",
+      "title": "Temperature History",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "#6ED0E0",
+                "value": 300
+              },
+              {
+                "color": "green",
+                "value": 310
+              },
+              {
+                "color": "red",
+                "value": 325
+              }
+            ]
+          },
+          "unit": "lux"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 6,
+        "x": 0,
+        "y": 17
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.0-cloud.2.aef9c3bd",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+          },
+          "query": "from(bucket: \"PROJECTB\")\r\n |> range(start: -1h)\r\n |> filter(fn: (r) => (r._measurement == \"18_luminosity\") and (r._field ==\"value\"))\r\n |> yield(name: \"_results\")",
+          "refId": "A"
+        }
+      ],
+      "title": "Last Luminosity value",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Lux",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "dashed"
+            }
+          },
+          "mappings": [
+            {
+              "options": {
+                "265": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "BASE"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 260
+              },
+              {
+                "color": "green",
+                "value": 265
+              },
+              {
+                "color": "red",
+                "value": 270
+              }
+            ]
+          },
+          "unit": "lux"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "custom.axisColorMode",
+                "value": "series"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 12,
+        "x": 6,
+        "y": 17
+      },
+      "id": 1,
+      "options": {
+        "legend": {
+          "calcs": [
+            "max",
+            "min",
+            "mean",
+            "variance"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+          },
+          "query": "from(bucket: \"PROJECTB\")\r\n |> range(start: -1h)\r\n |> filter(fn: (r) => (r._measurement == \"18_luminosity\") and (r._field ==\"value\"))\r\n |> yield(name: \"_results\")\r\n",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+          },
+          "hide": false,
+          "query": "from(bucket: \"PROJECTB\")\r\n |> range(start: -1h)\r\n |> filter(fn: (r) => (r._measurement == \"18_luminosity\") and (r._field ==\"value\"))\r\n |> movingAverage(n:30)\r\n |> yield(name: \"average\")\r\n",
+          "refId": "B"
+        }
+      ],
+      "timeShift": "0h",
+      "title": "Luminosity history",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 80,
+          "min": 20,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 20
+              },
+              {
+                "color": "yellow",
+                "value": 40
+              },
+              {
+                "color": "red",
+                "value": 60
+              }
+            ]
+          },
+          "unit": "humidity"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 6,
+        "x": 0,
+        "y": 28
+      },
+      "id": 11,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "10.0.0-cloud.2.aef9c3bd",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+          },
+          "query": "from(bucket: \"PROJECTB\")\r\n |> range(start: -1h)\r\n |> filter(fn: (r) => (r._measurement == \"sensor_data_hum_1\") and (r._field ==\"value\"))\r\n |> yield(name: \"_results\")",
+          "refId": "A"
+        }
+      ],
+      "title": "Last Value Humidity Sensor 1",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 1,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 6,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "dashed"
+            }
+          },
+          "mappings": [
+            {
+              "options": {
+                "50": {
+                  "index": 0,
+                  "text": "base"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 40
+              },
+              {
+                "color": "green",
+                "value": 50
+              },
+              {
+                "color": "red",
+                "value": 60
+              }
+            ]
+          },
+          "unit": "humidity"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "custom.axisColorMode",
+                "value": "series"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 12,
+        "x": 6,
+        "y": 28
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "mean",
+            "variance"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+          },
+          "query": "from(bucket: \"PROJECTB\")\r\n |> range(start: -1h)\r\n |> filter(fn: (r) => (r._measurement == \"sensor_data_hum_1\") and (r._field ==\"value\"))\r\n |> yield(name: \"_results\")",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+          },
+          "hide": false,
+          "query": "from(bucket: \"PROJECTB\")\r\n |> range(start: -1h)\r\n |> filter(fn: (r) => (r._measurement == \"sensor_data_hum_1\") and (r._field ==\"value\"))\r\n |> movingAverage(n:30)\r\n |> yield(name: \"average\")",
+          "refId": "B"
+        }
+      ],
+      "timeShift": "0h",
+      "title": "Humidity 1 History",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 80,
+          "min": 20,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 20
+              },
+              {
+                "color": "yellow",
+                "value": 40
+              },
+              {
+                "color": "red",
+                "value": 60
+              }
+            ]
+          },
+          "unit": "humidity"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 6,
+        "x": 0,
+        "y": 39
+      },
+      "id": 12,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "10.0.0-cloud.2.aef9c3bd",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+          },
+          "query": "from(bucket: \"PROJECTB\")\r\n |> range(start: -1h)\r\n |> filter(fn: (r) => (r._measurement == \"sensor_data_hum_2\") and (r._field ==\"value\"))\r\n |> yield(name: \"_results\")",
+          "refId": "A"
+        }
+      ],
+      "title": "Last Value Humidity Sensor 2",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "dashed"
+            }
+          },
+          "mappings": [
+            {
+              "options": {
+                "50": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "Base"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 40
+              },
+              {
+                "color": "green",
+                "value": 50
+              },
+              {
+                "color": "red",
+                "value": 60
+              }
+            ]
+          },
+          "unit": "humidity"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "custom.axisColorMode",
+                "value": "series"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 6,
+        "y": 39
+      },
+      "id": 8,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "mean",
+            "variance"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+          },
+          "query": "from(bucket: \"PROJECTB\")\r\n |> range(start: -1h)\r\n |> filter(fn: (r) => (r._measurement == \"sensor_data_hum_2\") and (r._field ==\"value\"))\r\n |> yield(name: \"_results\")",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+          },
+          "hide": false,
+          "query": "from(bucket: \"PROJECTB\")\r\n |> range(start: -1h)\r\n |> filter(fn: (r) => (r._measurement == \"sensor_data_hum_2\") and (r._field ==\"value\"))\r\n |> movingAverage(n:30)\r\n |> yield(name: \"average\")",
+          "refId": "B"
+        }
+      ],
+      "timeShift": "0h",
+      "title": "Humidity 2 History",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "kwatth"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 6,
+        "x": 0,
+        "y": 49
+      },
+      "id": 13,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.0-cloud.2.aef9c3bd",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+          },
+          "query": "from(bucket: \"PROJECTB\")\r\n |> range(start: -1h)\r\n |> filter(fn: (r) => (r._measurement == \"off_peak\") and (r._field ==\"value\"))\r\n |> yield(name: \"_results\")",
+          "refId": "A"
+        }
+      ],
+      "title": "Last Energy Value(Off Peak)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+      },
+      "description": "0.10EURO/Kwh",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Kw",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "kwatth"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 6,
+        "y": 49
+      },
+      "id": 9,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "mean",
+            "variance",
+            "sum"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.0.0-cloud.2.aef9c3bd",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+          },
+          "query": "from(bucket: \"PROJECTB\")\r\n |> range(start: -1h)\r\n |> filter(fn: (r) => (r._measurement == \"off_peak\") and (r._field ==\"value\"))\r\n |> yield(name: \"_results\")",
+          "refId": "A"
+        }
+      ],
+      "timeShift": "0h",
+      "title": "Sensor Energy(off_peak)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "kwatth"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 6,
+        "x": 0,
+        "y": 58
+      },
+      "id": 14,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.0-cloud.2.aef9c3bd",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+          },
+          "query": "from(bucket: \"PROJECTB\")\r\n |> range(start: -1h)\r\n |> filter(fn: (r) => (r._measurement == \"peak\") and (r._field ==\"value\"))\r\n |> yield(name: \"_results\")",
+          "refId": "A"
+        }
+      ],
+      "title": "Last Energy Value(Peak)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+      },
+      "description": "0.20euro/Kw",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "kwatth"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 6,
+        "y": 58
+      },
+      "id": 10,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "mean",
+            "variance",
+            "sum"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+          },
+          "query": "from(bucket: \"PROJECTB\")\r\n |> range(start: -1h)\r\n |> filter(fn: (r) => (r._measurement == \"peak\") and (r._field ==\"value\"))\r\n |> yield(name: \"_results\")",
+          "refId": "A"
+        }
+      ],
+      "timeShift": "0h",
+      "title": "Sensor energy(peak)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "displayName": "Valor/Custo Total(0.20€/kwh)",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "euros/Kwh"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 9,
+        "x": 0,
+        "y": 68
+      },
+      "id": 15,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.0-cloud.2.aef9c3bd",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+          },
+          "query": "from(bucket: \"PROJECTB\")\r\n  |> range(start: -24h)\r\n  |> filter(fn: (r) => r._measurement == \"peak\")\r\n  |> map(fn: (r) => ({\r\n      _time: r._time,\r\n      _value: r._value,\r\n      total_cost: r._value * 0.2  // Assuming a predefined cost value of 0.2\r\n    }))\r\n  |> yield(name: \"data\")",
+          "refId": "A"
+        }
+      ],
+      "title": "Total Cost( Peak)",
+      "transformations": [],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 7,
+        "x": 9,
+        "y": 68
+      },
+      "id": 16,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "mean"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.0.0-cloud.2.aef9c3bd",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+          },
+          "query": "from(bucket: \"PROJECTB\")\r\n  |> range(start: -24h)\r\n  |> filter(fn: (r) => (r._measurement == \"peak\" or r._measurement == \"off_peak\"))\r\n  |> aggregateWindow(every: 1m, fn: mean, createEmpty: false)  // Adjust the aggregation interval as per your data resolution\r\n  |> yield(name: \"value\")",
+          "refId": "A"
+        }
+      ],
+      "title": "Variação da energia ao longo ",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "displayName": "Valor/Custo Total(0.10€/kwh)",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "euros/KwH"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 8,
+        "x": 16,
+        "y": 68
+      },
+      "id": 17,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.0-cloud.2.aef9c3bd",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "e7541540-d94c-4529-856d-a7fadbc716ca"
+          },
+          "query": "from(bucket: \"PROJECTB\")\r\n  |> range(start: -24h)\r\n  |> filter(fn: (r) => r._measurement == \"off_peak\")\r\n  |> map(fn: (r) => ({\r\n      _time: r._time,\r\n      _value: r._value,\r\n      total_cost: r._value * 0.1  // Assuming a predefined cost value of 0.1\r\n    }))\r\n  |> yield(name: \"data\")",
+          "refId": "A"
+        }
+      ],
+      "title": "Total Cost(Off_Peak)",
+      "type": "stat"
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Project SRSA Dashboard",
+  "uid": "b3a8d83f-6f4c-4017-ac6c-989842ed84c4",
+  "version": 19,
+  "weekStart": ""
+}

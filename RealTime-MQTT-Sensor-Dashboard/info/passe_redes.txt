@@ -1,0 +1,6 @@
+group18
+alicesrsa
+10.6.1.10
+
+python -m venv project
+source project/bin/activate
